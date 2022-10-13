@@ -323,16 +323,17 @@ VirtrIO驱动下载地址：https://fedorapeople.org/groups/virt/virtio-win/dire
 
 
 TrueNas：
-
 - [硬盘直通](./details/pve硬盘直通.md)
-- 配置存储池
-- 配置NFS
-- 配置SMB
-- 配置WebDAV
+- [配置用户及权限](./details/truenas下配置用户及权限.md)
+- [配置存储池](/details/TrueNAS存储池配置.md)
+- [配置NFS](/details/TrueNAS下的NFS服务配置.md)
+- [配置SMB](/details/TrueNas配置SMB.md)
+- [配置WebDAV](/details/TrueNAS下的WebDAV服务配置.md)
 
-服务主机：
+服务主机ubuntu：
 
-- 使用setupaquar.sh脚本进行环境初始化
+- 使用setup_aquar.sh脚本进行环境初始化
+- 设置docker-compose等待nfs挂载后再启动
 
 Windows虚拟机：
 
