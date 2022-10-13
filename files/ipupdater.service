@@ -1,0 +1,11 @@
+[Unit]
+Description=update ip config when system start
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=python3 /root/ipupdater.py 
+
+[Install]
+WantedBy=multi-user.target
