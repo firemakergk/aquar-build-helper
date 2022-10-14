@@ -325,22 +325,35 @@ VirtrIO驱动下载地址：https://fedorapeople.org/groups/virt/virtio-win/dire
 TrueNas：
 - [硬盘直通](./details/pve硬盘直通.md)
 - [配置用户及权限](./details/truenas下配置用户及权限.md)
-- [配置存储池](/details/TrueNAS存储池配置.md)
-- [配置NFS](/details/TrueNAS下的NFS服务配置.md)
-- [配置SMB](/details/TrueNas配置SMB.md)
-- [配置WebDAV](/details/TrueNAS下的WebDAV服务配置.md)
+- [配置存储池](./details/TrueNAS存储池配置.md)
+- [配置NFS](./details/TrueNAS下的NFS服务配置.md)
+- [配置SMB](./details/TrueNas配置SMB.md)
+- [配置WebDAV](./details/TrueNAS下的WebDAV服务配置.md)
 
 服务主机ubuntu：
 
-- 使用setup_aquar.sh脚本进行环境初始化
+- [使用setup_aquar.sh脚本进行环境初始化](./details/使用setup_aquar.sh脚本进行环境初始化)
 - 设置docker-compose等待nfs挂载后再启动
 
 Windows虚拟机：
 
-- SMB挂载
-- 显卡直通
-- USB直通
+- [SMB挂载](./details/TrueNas配置SMB.md)（参考TrueNAS配置SMB服务的后半段）
+- [显卡直通](./details/pve虚拟机设置及独显直通.md)
+- [USB直通](./details/pve下直通usb.md)
 
-## 服务初始化配置：
+## 服务初始化配置
+在服务跑起来之后，他们大多数应用都需要一个初始化配置的过程，大部分配置比较简单，可以凭借页面的提示直接完成，同时也可以去参考各个应用的官方文档页面。在此我列出一些与Aquar环境相关的几个注意事项：
 
-## AquarHome组件配置：
+1. setup_aquar.sh脚本会将NFS服务挂载在`/opt/aquar/storages/aquarpool/`路径下，默认的docker应用配置大多使用了这个目录或者其子目录。
+2. aquar启动了一个公用的mariadb数据库容器来满足一些依赖数据库服务的容器需求，而有赖于docker本身的网络别名机制，当需要配置数据库地址时，我们只需要写“mariadb”即可，docker的虚拟网络会帮我们找到数据库服务。这在Nextcloud的初始化配置时非常关键。
+3. 如果你发现自己不知道docker系统的默认用户名和密码，请先核对位于`/opt/aquar/src/docker-compose/docker-compose.yml`的docker配置信息，如果你想修改配置信息，也应该在这里修改。
+
+## 与系统磨合
+
+当你的应用容器启动并初始化完成后，Aquar系统的大部分核心能力就已经具备了，走过这么长的路实属不易。
+
+然而你和这个系统的磨合才刚刚开始。再次强调文档开头的话：“软件系统**生长**在使用者的需求之上。”你的需求是它存在的基础。在此后的很长一段时间内，你将由自己的需求驱动，深入地调整每一个docker服务，配置每一项AquarHome组件，下载应用对应地app，搭建自己的自动化同步体系等等。这个过程比搭建系统本身更加漫长，也更加重要，它决定了你和这套系统的相处是细水长流还是三分热度。希望你能在探索和磨合中享受这个过程。
+
+AquarHome的详细配置文档如下，不得不说，配置AquarHome的过程同样需要很多耐心和时间，希望这些都值得。
+
+[https://gitee.com/firemaker/aquar-home-helper](https://gitee.com/firemaker/aquar-home-helper)

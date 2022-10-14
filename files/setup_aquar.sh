@@ -157,7 +157,7 @@ services:
     ports:
       - 8042:2342 # [local port]:[container port]
     environment:
-      PHOTOPRISM_ADMIN_PASSWORD: "<utf-8>"
+      PHOTOPRISM_ADMIN_PASSWORD: "admin"
       PHOTOPRISM_HTTP_PORT: 2342
       PHOTOPRISM_HTTP_COMPRESSION: "gzip"
       PHOTOPRISM_DEBUG: "false"
@@ -275,7 +275,6 @@ services:
       - /opt/aquar/storages/apps/aquarhome/logs:/root/.pm2/logs
     ports:
       - 8172:8172
-      - 10000-10100:10000-10100
     restart: unless-stopped
 EOF
 mkdir -p /opt/aquar/src/docker-compose/mariadb.init.d
