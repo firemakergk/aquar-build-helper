@@ -333,7 +333,8 @@ TrueNas：
 服务主机ubuntu：
 
 - [使用setup_aquar.sh脚本进行环境初始化](./details/使用setup_aquar.sh脚本进行环境初始化)
-- 设置docker-compose等待nfs挂载后再启动
+- [设置docker-compose等待nfs挂载后再启动](./details/设置docker-compose等待nfs挂载后再启动.md)
+- [使用truenasseeker.py脚本自动扫描nfs服务并挂载](./details/使用truenasseeker.py脚本自动扫描nfs服务并挂载.md)
 
 Windows虚拟机：
 

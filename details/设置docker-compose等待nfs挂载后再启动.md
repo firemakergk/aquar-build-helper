@@ -1,5 +1,7 @@
 设置docker-compose等待nfs挂载后再启动
 
+默认情况下docker-compose中的服务和nfs挂载动作的执行是不区分先后顺序的，这会导致开机以后docker服务已经启动但nfs挂载点未就绪，于是在docker应用中就无法正常的看到存储池中的文件了。所以这一步是必不可少的。
+
 1.执行`sudo -i`进入管理员角色
 
 2.执行`systemctl list-units | grep mount`寻找与fstab中配置对应的信息
