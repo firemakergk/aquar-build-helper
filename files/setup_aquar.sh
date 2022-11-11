@@ -69,7 +69,7 @@ EOF
 chmod +x /usr/local/bin/aqserv
 
 echo '********安装docker********'
-sudo apt-get install software-properties-common
+sudo apt-get install -y software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
 $(lsb_release -cs) \
@@ -129,7 +129,7 @@ services:
       - 8920:8920 #optional
       - 7359:7359/udp #optional
       - 1900:1900/udp #optional
-      restart: unless-stopped
+    restart: unless-stopped
   syncthing:
     image: ghcr.io/linuxserver/syncthing
     container_name: syncthing
