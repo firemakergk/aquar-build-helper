@@ -1,8 +1,5 @@
 #! /usr/bin/env python
 # vim: set fenc=utf8 ts=4 sw=4 et :
-# -------------环境安装----------------
-# apt-get install python3-netifaces
-#
 # -----------/lib/systemd/system/ipupdater.service systemd配置---------------
 # [Unit]
 # Description=update ip config when system start
@@ -17,25 +14,36 @@
 # WantedBy=multi-user.target
 
 
-import netifaces as ni
-import os
-import getopt
+# import netifaces as ni
+# import os
+# import getopt
 import socket
 import shutil
 import re
-from ipaddress import IPv4Network
-import time
+# from ipaddress import IPv4Network
+# import time
 
 NTERFACE_PATH = '/etc/network/interfaces'
 HOSTS_PATH = '/etc/hosts'
 ISSUE_PATH = '/etc/issue'
 
 def getRealNetInfo():
-    defaultGateWay, defaultInterface = ni.gateways()['default'][ni.AF_INET]
-    addressInfo = ni.ifaddresses(defaultInterface)[ni.AF_INET][0]
-    ip = addressInfo['addr']
-    maskBits = IPv4Network('0.0.0.0/'+addressInfo['netmask']).prefixlen
-    return ip, defaultGateWay, maskBits
+    # defaultGateWay, defaultInterface = ni.gateways()['default'][ni.AF_INET]
+    # addressInfo = ni.ifaddresses(defaultInterface)[ni.AF_INET][0]
+    # ip = addressInfo['addr']
+    # maskBits = IPv4Network('0.0.0.0/'+addressInfo['netmask']).prefixlen
+    # return ip, defaultGateWay, maskBits
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(0)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.254.254.254', 1))
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = '127.0.0.1'
+    finally:
+        s.close()
+    return ip 
 
 def checkIfIpChanged(ip, defaultGateWay):
     shutil.copy(INTERFACE_PATH, INTERFACE_PATH + '.bak')
@@ -79,14 +87,14 @@ def updateHosts(ip):
     shutil.copy(HOSTS_PATH, HOSTS_PATH + '.bak')
     targetFile = open(HOSTS_PATH, "r+")
     configText = targetFile.read()
-    splitRes = re.split("\n.+ peng.py peng\n", configText)
+    splitRes = re.split("\n.+ pve\n", configText)
     print(splitRes)
     prepart = splitRes[0]
     postpart = splitRes[1]
-    updateConfig = "\n%s peng.py peng\n" % ip
-    print("host updateConfig: %s" % updateConfig)
+    updateConfig = "\n%s pve\n" % ip
+    print("----host updateConfig----\n %s" % updateConfig)
     newConifg = prepart + updateConfig+ postpart
-    print("host newConifg:%s" % newConifg)
+    print("----host newConifg----\n%s" % newConifg)
 
     targetFile.seek(0)
     targetFile.write(newConifg)
@@ -101,9 +109,9 @@ def updateIssue(ip):
     prepart = splitRes[0]
     postpart = splitRes[1]
     updateConfig = "  https://%s:8006/\n" % ip
-    print("issue updateConfig: %s" % updateConfig)
+    print("----issue updateConfig----\n%s" % updateConfig)
     newConifg = prepart + updateConfig+ postpart
-    print("issue newConifg:%s" % newConifg)
+    print("----issue newConifg----\n%s" % newConifg)
 
     targetFile.seek(0)
     targetFile.write(newConifg)
@@ -113,8 +121,8 @@ def updateIssue(ip):
 
 if __name__ == "__main__":
     print('ipupdater start.')
-    ip, defaultGateWay, maskBits = getRealNetInfo()
-    print("ip:%s defaultGateWay: %s" % (ip,defaultGateWay))
+    ip = getRealNetInfo()
+    print("ip:%s" % ip)
     updateHosts(ip)
     updateIssue(ip)
     # if checkIfIpChanged(ip, defaultGateWay): 

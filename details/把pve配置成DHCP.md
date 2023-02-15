@@ -35,6 +35,9 @@ iface enp0s31f6 inet manual
 
 auto vmbr0
 iface vmbr0 inet dhcp
+bridge-ports enp0s31f6
+        bridge-stp off
+        bridge-fd 0
 
 iface enp3s0 inet manual
 ```
