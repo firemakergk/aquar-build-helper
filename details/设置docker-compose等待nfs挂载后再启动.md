@@ -120,3 +120,8 @@ OOMScoreAdjust=-500
 [Install]
 WantedBy=multi-user.target
 ```
+5.执行`systemctl daemon-reload`重载系统服务。
+
+6.执行`systemctl enable trunas-scan.service`将脚本设置为开机启动。
+
+7.执行`systemctl status trunas-scan.service`查看服务在loaded那一行是否为enabled。如果是，则代表脚本正常部署了。

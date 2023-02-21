@@ -10,12 +10,12 @@ echo '********安装&挂载NFS********'
 apt install nfs-common -y
 mkdir -p /opt/aquar/storages/aquarpool/
 echo 'mount nfs'
-mount -t nfs $nfspath:/mnt/aquar_pool /opt/aquar/storages/aquarpool/
+mount -t nfs $nfspath:/mnt/aquarpool /opt/aquar/storages/aquarpool/
 if ! grep -q '##\[aquar config start\]##' /etc/fstab;
 then
     cat >> /etc/fstab <<EOF
 ##[aquar config start]##
-$nfspath:/mnt/aquar_pool /opt/aquar/storages/aquarpool nfs defaults,_netdev 0 0
+$nfspath:/mnt/aquarpool /opt/aquar/storages/aquarpool nfs defaults,_netdev 0 0
 ##[aquar config end]##
 EOF
 else
@@ -191,7 +191,7 @@ services:
       # Permanent storage for settings, index & sidecar files (DON'T REMOVE):
       - "/opt/aquar/storages/apps/photoprism/storage:/photoprism/storage"
   mariadb:
-    image: mariadb:10.4
+    image: mariadb:10.9.5
     volumes:
       - /opt/aquar/storages/apps/mariadb:/var/lib/mysql
       - /opt/aquar/src/docker-compose/mariadb.init.d:/docker-entrypoint-initdb.d

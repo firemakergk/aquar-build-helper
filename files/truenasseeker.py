@@ -94,7 +94,7 @@ def updatefstab(nfsAdress):
     configText = fstabFile.read()
     prepart = re.split("##\[aquar config start\]##", configText)[0]
     postpart = re.split("##\[aquar config end\]##", configText)[1]
-    nfsConfig = "\n##[aquar config start]##\n %s:/mnt/aquarpool /opt/aquar/storages/aquarpool nfs defaults,_netdev 0 0\n##[aquar config end]##\n" % nfsAdress
+    nfsConfig = "\n##[aquar config start]##\n %s:/mnt/aquar_pool /opt/aquar/storages/aquarpool nfs defaults,_netdev 0 0\n##[aquar config end]##\n" % nfsAdress
     logger.info("new nfs config:")
     logger.info(nfsConfig)
     newConifg = prepart + nfsConfig+ postpart
