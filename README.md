@@ -327,8 +327,8 @@ VirtrIO驱动下载地址：https://fedorapeople.org/groups/virt/virtio-win/dire
 
 TrueNas：
 - [硬盘直通](./details/pve硬盘直通.md)
-- [配置用户及权限](./details/truenas下配置用户及权限.md)
 - [配置存储池](./details/TrueNAS存储池配置.md)
+- [配置用户及权限](./details/truenas下配置用户及权限.md)
 - [配置NFS](./details/TrueNAS下的NFS服务配置.md)
 - [配置SMB](./details/TrueNas配置SMB.md)
 - [配置WebDAV](./details/TrueNAS下的WebDAV服务配置.md)

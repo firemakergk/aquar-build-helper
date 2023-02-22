@@ -277,6 +277,23 @@ services:
     ports:
       - 8172:8172
     restart: unless-stopped
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ="Asia/Shanghai"
+      - WEBUI_PORT=8082
+    volumes:
+      - /opt/aquar/storages/apps/qbittorrent/config:/config
+      - /opt/aquar/storages/aquarpool/qbdownloads:/downloads
+      # - /opt/vc/lib:/opt/vc/lib #optional
+    ports:
+      - 8082:8082
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
 EOF
 mkdir -p /opt/aquar/src/docker-compose/mariadb.init.d
 touch /opt/aquar/src/docker-compose/mariadb.init.d/init.sql
