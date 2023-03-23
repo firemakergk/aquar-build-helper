@@ -17,7 +17,7 @@ pip install scapy python-nmap pyfunctional
 
 你可以尝试执行`python3 /opt/aquar/src/truenasseeker.py`命令运行一次看是否会出错，正常情况下它会输出"truenas seeker is no need to do anything."
 
-4.创建`/usr/lib/systemd/system/trunas-scan.service`配置文件,配置内容如下：
+4.创建`/usr/lib/systemd/system/truenas-scan.service`配置文件,配置内容如下：
 
 ```
 [Unit]
@@ -35,6 +35,6 @@ WantedBy=multi-user.target
 
 5.执行`systemctl daemon-reload`重载系统服务。
 
-6.执行`systemctl enable trunas-scan.service`将脚本设置为开机启动。
+6.执行`systemctl enable truenas-scan.service`将脚本设置为开机启动。
 
-7.执行`systemctl status trunas-scan.service`查看服务在loaded那一行是否为enabled。如果是，则代表脚本正常部署了。
+7.执行`systemctl status truenas-scan.service`查看服务在loaded那一行是否为enabled。如果是，则代表脚本正常部署了。

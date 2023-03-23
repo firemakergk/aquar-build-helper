@@ -1,4 +1,4 @@
-aquar系统搭建指南
+# <center> aquar系统搭建指南
 
 # 整体介绍
 
@@ -317,6 +317,7 @@ VirtrIO驱动下载地址：https://fedorapeople.org/groups/virt/virtio-win/dire
 
 ### 宿主机：
 
+- [设置PVE的apt源](./details/设置PVE的apt源.md)
 - [将PVE设置为DHCP动态地址](./details/把pve配置成DHCP.md)
 - [开机IP自检及更新脚本](./details/开机IP自检及更新脚本.md)
 - UPS配置
