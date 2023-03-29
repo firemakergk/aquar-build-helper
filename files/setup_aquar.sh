@@ -99,6 +99,7 @@ version: "3"
 services:
   nextcloud:
     image: nextcloud
+    container_name: nextcloud
     volumes:
       # 挂载配置文件
       - /opt/aquar/storages/apps/nextcloud:/var/www/html
@@ -149,6 +150,7 @@ services:
     restart: unless-stopped
   photoprism:
     image: photoprism/photoprism:latest
+    container_name: photoprism
     depends_on:
       - "mariadb"
     # restart: unless-stopped
@@ -192,6 +194,7 @@ services:
       - "/opt/aquar/storages/apps/photoprism/storage:/photoprism/storage"
   mariadb:
     image: mariadb:10.9.5
+    container_name: mariadb
     volumes:
       - /opt/aquar/storages/apps/mariadb:/var/lib/mysql
       - /opt/aquar/src/docker-compose/mariadb.init.d:/docker-entrypoint-initdb.d
@@ -208,25 +211,6 @@ services:
     ports:
       - "3306:3306"
     restart: unless-stopped
-  transmission:
-    image: ghcr.io/linuxserver/transmission
-    container_name: transmission
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ="Asia/Shanghai"
-      - TRANSMISSION_WEB_HOME=/combustion-release/
-      - USER=admin
-      - PASS=admin
-    volumes:
-      - /opt/aquar/storages/apps/transmission/config:/config
-      - /opt/aquar/storages/aquarpool/btdownload:/downloads
-      - /opt/aquar/storages/apps/transmission/watch:/watch
-    ports:
-      - 9091:9091
-      - 51413:51413
-      - 51413:51413/udp
-    restart: unless-stopped
   filerun:
     image: filerun/filerun
     container_name: filerun
@@ -236,9 +220,9 @@ services:
       FR_DB_NAME: filerun
       FR_DB_USER: root
       FR_DB_PASS: root
-      APACHE_RUN_USER: www-data
+      APACHE_RUN_USER: aquar
       APACHE_RUN_USER_ID: 1000
-      APACHE_RUN_GROUP: www-data
+      APACHE_RUN_GROUP: aquar
       APACHE_RUN_GROUP_ID: 1000
     depends_on:
       - mariadb
