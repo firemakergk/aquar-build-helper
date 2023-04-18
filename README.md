@@ -200,6 +200,13 @@ TrueNAS官方文档：https://www.truenas.com/docs/core/corepreviousversion/
 
 在大概第20页的安装章节可以看到指引。安装时没有什么特别需要注意之处。
 
+由于在一些USB设备连接不稳定的情况下，TrueNAS虚拟机会收到USB热插拔的影响而死机，所以安装完成以后打开虚拟机的Options（选项）页，双击Hotplug设置项，把USB选项的勾选去掉。
+
+![chrome_1uJ1ZCpagD.png](./_resources/chrome_1uJ1ZCpagD.png)
+
+![chrome_KfH3snsPtM.png](./_resources/chrome_KfH3snsPtM.png)
+
+
 **5.验证安装**
 
 TrueNAS安装成功后应该可以在console上看到类似下面的提示，在局域网中使用浏览器打开提示中的地址应该就可以看到TrueNAS的Web页面了。
