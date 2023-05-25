@@ -112,25 +112,40 @@ services:
     depends_on:
       - "mariadb"
     restart: unless-stopped
+  # jellyfin:
+  #   image: ghcr.io/linuxserver/jellyfin
+  #   container_name: jellyfin
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ="Asia/Shanghai"
+  #     # - UMASK_SET=<022> #optional
+  #   volumes:
+  #     - /opt/aquar/storages/apps/jellyfin/config:/config
+  #     - /opt/aquar/storages/apps/jellyfin/data/tvshows:/data/tvshows
+  #     - /opt/aquar/storages/aquarpool/movies:/data/movies
+  #     # - /opt/vc/lib:/opt/vc/lib #optional
+  #   ports:
+  #     - 8096:8096
+  #     - 8920:8920 #optional
+  #     - 7359:7359/udp #optional
+  #     - 1900:1900/udp #optional
+  #   restart: unless-stopped
   jellyfin:
-    image: ghcr.io/linuxserver/jellyfin
+    image: nyanmisaka/jellyfin
     container_name: jellyfin
+    network_mode: host
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ="Asia/Shanghai"
-      # - UMASK_SET=<022> #optional
+      - TZ=Asia/Shanghai
+        # - JELLYFIN_PublishedServerUrl="http://192.168.0.118:8096" #optional
     volumes:
       - /opt/aquar/storages/apps/jellyfin/config:/config
-      - /opt/aquar/storages/apps/jellyfin/data/tvshows:/data/tvshows
-      - /opt/aquar/storages/aquarpool/movies:/data/movies
-      # - /opt/vc/lib:/opt/vc/lib #optional
-    ports:
-      - 8096:8096
-      - 8920:8920 #optional
-      - 7359:7359/udp #optional
-      - 1900:1900/udp #optional
+      - /opt/aquar/storages/apps/jellyfin/cache:/cache
+      - /opt/aquar/storages/aquarpool/movies:/media
     restart: unless-stopped
+    privileged: true
+    devices:
+      - /dev/dri:/dev/dri
   syncthing:
     image: ghcr.io/linuxserver/syncthing
     container_name: syncthing
@@ -293,7 +308,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
 EOF
 cat >  /etc/docker/daemon.json <<EOF
 {
-"registry-mirrors": ["https://docker.mirrors.ustc.edu.cn"]
+"registry-mirrors": ["https://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn"]
 }
 EOF
 
@@ -320,4 +335,5 @@ systemctl enable aquar
 echo '********启动docker-compose********'
 cd /opt/aquar/src/docker-compose/
 docker-compose up -d
+mkdir -p /opt/aquar/storages/apps/filerun/html/system/data/temp
 # systemctl start aquar
