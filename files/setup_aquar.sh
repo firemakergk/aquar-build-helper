@@ -25,22 +25,22 @@ fi
 echo '********安装python3及venv********'
 apt install curl -y
 apt install python3-pip -y
-pip3 install virtualenv
-pip3 install virtualenvwrapper
-if ! grep -q '##\[aquar config start\]##' /root/.bashrc;
-then
-cp /root/.bashrc /root/.bashrc.bak
-cat >> /root/.bashrc <<EOF
-##[aquar config start]##
-export WORKON_HOME=$HOME/.virtualenvs
-export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
-source /usr/local/bin/virtualenvwrapper.sh
-##[aquar config end]##
-EOF
-else
-    echo '********探测到已配置成功，跳过/root/.bashrc的配置********'
-fi
-source /root/.bashrc
+# pip3 install virtualenv
+# pip3 install virtualenvwrapper
+# if ! grep -q '##\[aquar config start\]##' /root/.bashrc;
+# then
+# cp /root/.bashrc /root/.bashrc.bak
+# cat >> /root/.bashrc <<EOF
+# ##[aquar config start]##
+# export WORKON_HOME=$HOME/.virtualenvs
+# export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+# # source /usr/local/bin/virtualenvwrapper.sh
+# ##[aquar config end]##
+# EOF
+# else
+#     echo '********探测到已配置成功，跳过/root/.bashrc的配置********'
+# fi
+# source /root/.bashrc
 cat > /usr/local/bin/aqserv <<EOF
 #!/bin/bash
 cmd=\$1
@@ -49,21 +49,19 @@ if [ "\$cmd" != "start" ] && [ "\$cmd" != "stop" ] && [ "\$cmd" != "restart" ] &
     exit 0
 fi
 source /root/.bashrc
-source /usr/local/bin/virtualenvwrapper.sh
-workon aquar
 cd /opt/aquar/src/docker-compose/
 if [ "\$cmd" == "start" ]; then
     echo "aquar docker services starting"
-    docker-compose up -d
+    docker compose up -d
 elif [ "\$cmd" == "stop" ]; then
     echo "aquar docker services stoping"
-    docker-compose stop
+    docker compose stop
 elif [ "\$cmd" == "restart" ]; then
     echo "aquar docker services restarting"
-    docker-compose restart
+    docker compose restart
 
 else
-    docker-compose ps
+    docker compose ps
 fi
 EOF
 chmod +x /usr/local/bin/aqserv
@@ -76,20 +74,20 @@ $(lsb_release -cs) \
 stable"
 apt-get update
 apt-get install docker-ce docker-ce-cli containerd.io -y
-
-echo '********创建python环境aquar并安装docker-compose********'
-source /root/.bashrc
-source /usr/local/bin/virtualenvwrapper.sh
-if ! grep -q 'source /usr/local/bin/virtualenvwrapper.sh' /root/.bashrc;
-then
-cat >> /root/.bashrc <<EOF
-source /usr/local/bin/virtualenvwrapper.sh
+apt-get install docker-compose-plugin -y
+# echo '********创建python环境aquar并安装docker-compose********'
+# source /root/.bashrc
+# source /usr/local/bin/virtualenvwrapper.sh
+# if ! grep -q 'source /usr/local/bin/virtualenvwrapper.sh' /root/.bashrc;
+# then
+# cat >> /root/.bashrc <<EOF
+# source /usr/local/bin/virtualenvwrapper.sh
 ##[aquar config end]##
-EOF
-fi
-mkvirtualenv aquar
-workon aquar
-pip install docker-compose
+# EOF
+# fi
+# mkvirtualenv aquar
+# workon aquar
+# pip install docker-compose
 
 echo '********配置docker-compose********'
 mkdir -p /opt/aquar/src/docker-compose/
@@ -98,7 +96,7 @@ cat > /opt/aquar/src/docker-compose/docker-compose.yml <<EOF
 version: "3"
 services:
   nextcloud:
-    image: nextcloud
+    image: nextcloud:22.2.4-apache
     container_name: nextcloud
     volumes:
       # 挂载配置文件
@@ -107,6 +105,11 @@ services:
       - /opt/aquar/storages/apps/nextcloud/config:/var/www/html/config
       - /opt/aquar/storages/apps/nextcloud/data:/var/www/html/data
       - /opt/aquar/storages/aquarpool:/opt/aquarpool
+    environment:
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=root
+      - MYSQL_HOST=mariadb:3306
     ports:
       - "8081:80"
     depends_on:
@@ -208,7 +211,7 @@ services:
       # Permanent storage for settings, index & sidecar files (DON'T REMOVE):
       - "/opt/aquar/storages/apps/photoprism/storage:/photoprism/storage"
   mariadb:
-    image: mariadb:10.9.5
+    image: mariadb:10.5.23
     container_name: mariadb
     volumes:
       - /opt/aquar/storages/apps/mariadb:/var/lib/mysql
@@ -334,6 +337,6 @@ systemctl enable aquar
 
 echo '********启动docker-compose********'
 cd /opt/aquar/src/docker-compose/
-docker-compose up -d
+docker compose up -d
 mkdir -p /opt/aquar/storages/apps/filerun/html/system/data/temp
 # systemctl start aquar

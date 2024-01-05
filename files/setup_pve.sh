@@ -16,33 +16,34 @@ else
     echo '********探测到已配置成功，跳过/etc/fstab的配置********'
 fi
 apt update
+apt install pve-kernel-6.2
+proxmox-boot-tool kernel list
+proxmox-boot-tool kernel pin 6.2.11-2-pve
 echo '*******配置vmbr1********'
 
-sed -i '/iface vmbr0 inet static/s/static/dhcp/g' /etc/network/interfaces
-sed -i '/address [0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+/d' /etc/network/interfaces
-sed -i '/gateway [0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+/d' /etc/network/interfaces
-if ! grep -q '##\[aquar config start\]##' /etc/network/interfaces;
+if ! grep -q 'vmbr1' /etc/network/interfaces;
 then
     cp /etc/network/interfaces /etc/network/interfaces.bak
+    sed -i '/iface vmbr0 inet static/s/static/dhcp/g' /etc/network/interfaces
+    sed -i '/address [0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+/d' /etc/network/interfaces
+    sed -i '/gateway [0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+/d' /etc/network/interfaces
     cat >> /etc/network/interfaces <<EOF
 
-##[aquar config start]##
 auto vmbr1
 iface vmbr1 inet static
         address 192.168.172.1/24
         bridge-ports none
         bridge-stp off
         bridge-fd 0
-##[aquar config end]##
 EOF
 else
-    echo '********探测到已配置成功，跳过/etc/fstab的配置********'
+    echo '********探测到已配置成功，跳过/etc/network/interfaces的配置********'
 fi
 
 echo '*******安装ipupdater.py脚本********'
-sed '/(^10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}.+$)|(^172\.1[6-9]\.[0-9]{1,3}\.[0-9]{1,3}.+$)|(^172\.2[0-9]\.[0-9]{1,3}\.[0-9]{1,3}.+$)|(^172\.3[0-1]\.[0-9]{1,3}\.[0-9]{1,3}.+$)|(^192\.168\.[0-9]{1,3}\.[0-9]{1,3}.+$)/s/static/dhcp/g' /etc/hosts
+# sed '/(^10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}.+$)|(^172\.1[6-9]\.[0-9]{1,3}\.[0-9]{1,3}.+$)|(^172\.2[0-9]\.[0-9]{1,3}\.[0-9]{1,3}.+$)|(^172\.3[0-1]\.[0-9]{1,3}\.[0-9]{1,3}.+$)|(^192\.168\.[0-9]{1,3}\.[0-9]{1,3}.+$)/s/static/dhcp/g' /etc/hosts
 ## 扫描hosts中的内容，取出带有私有地址的那一行，找到后面跟的host名称，赋值到变量，然后带入到下面的脚本中
-pve_host=$(grep -m1 "^:" /tmp/example.log)
+pve_host=$(awk '{print $1}' /etc/hostname)
 
 cat > /root/ipupdater.py <<EOF
 #! /usr/bin/env python
@@ -129,11 +130,11 @@ def updateHosts(ip):
     shutil.copy(HOSTS_PATH, HOSTS_PATH + '.bak')
     targetFile = open(HOSTS_PATH, "r+")
     configText = targetFile.read()
-    splitRes = re.split("\n.+ pve\n", configText)
+    splitRes = re.split("\n.+ ${pve_host}\n", configText)
     print(splitRes)
     prepart = splitRes[0]
     postpart = splitRes[1]
-    updateConfig = "\n%s pve\n" % ip
+    updateConfig = "\n%s ${pve_host}\n" % ip
     print("----host updateConfig----\n %s" % updateConfig)
     newConifg = prepart + updateConfig+ postpart
     print("----host newConifg----\n%s" % newConifg)
@@ -189,14 +190,14 @@ systemctl enable ipupdater.service
 ls -l /dev/disk/by-id/
 # 获取到这个命令的磁盘信息
 
-qm set 101 -scsi2 /dev/disk/by-id/ata-WDC_WD42PURU-78C4CY0_WD-WX42AC29T231
-qm set 101 -scsi3 /dev/disk/by-id/ata-WDC_WD42PURU-78C4CY0_WD-WXD2A13N6NCP
+qm set 101 -scsi2 /dev/disk/by-id/ata-ST4000VX015-3CU104_WW618Q3D
+qm set 101 -scsi3 /dev/disk/by-id/ata-ST4000VX015-3CU104_WW6199F0
 
 # 配置TrueNAS的存储池
 
 
 cp /etc/default/grub /etc/default/grub.bak
-sed -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/quiet/quiet quiet intel_iommu=on video=efifb:off,vesafb:off i915.enable_guc=7/g' /etc/default/grub
+sed -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/quiet/quiet quiet intel_iommu=on iommu=pt video=efifb:off,vesafb:off i915.enable_guc=7/g' /etc/default/grub
 
 cat > /etc/modules <<EOF
 vfio
@@ -211,14 +212,16 @@ blacklist snd_hda_codec_hdmi
 blacklist i915
 EOF
 update-grub
+update-initramfs -u -k all
+#####重启######
 reboot
 
 # 从配置中拿出8086:4680的部分
-$gpu_info=lspci -n -s 00:02
+gpu_info=$(lspci -n -s 00:02 | perl -n -e'/00\:02.+? .+: (.+\:.+) \(rev 06\)/ && print $1')
 cat > /etc/modprobe.d/vfio.conf <<EOF
-options vfio-pci ids=8086:4680
+options vfio-pci ids=${gpu_info}
 EOF
-update-initramfs -u
+
 # 配置TrueNAS的网卡
 ######################Ubuntu中执行##########################
 # 配置Ubuntu的网卡
@@ -242,9 +245,9 @@ network:
         addresses: [8.8.8.8,114.114.114.114,192.168.3.1]
 EOF
 
-apt install intel-gpu-tools
-apt install libmfx1 libmfx-tools
-apt install libva-dev libmfx-dev intel-media-va-driver-non-free
+apt install -y intel-gpu-tools
+apt install -y libmfx1 libmfx-tools
+apt install -y libva-dev libmfx-dev intel-media-va-driver-non-free
 
 cat >> /etc/bash.bashrc <<EOF
 export LIBVA_DRIVER_NAME=iHD
