@@ -3,7 +3,10 @@
 PVE更新了7.4版本以后，官方提供了一个可选的6.2版本的内核，这样一来就可以通过自行将系统内核升级到这个版本来获得对Intel 12代以后CPU核显的直通能力了。这篇文档除了直通配置以外还包含了jellyfin硬解的配置。
 
 # 操作步骤
-## 1.升级pve内核至6.2版本
+
+## 1.升级pve内核至6.2版本（PVE8以上直接跳过）
+
+**注意：如果你使用的PVE版本是8，那么PVE的核心本身就是6.2以上的，所以在这种情况下，应该直接跳过步骤1。**
 
 1.1设置软件源为：
 
@@ -50,7 +53,7 @@ proxmox-boot-tool kernel pin 6.2.11-1-pve
 
 3.0 以超级用户身份登录
 
-3.1`vi /etc/default/grub`编辑grub配置，将GRUB\_CMDLINE\_LINUX\_DEFAULT的值改为"quiet intel\_iommu=on video=efifb:off,vesafb:off i915.enable_guc=7"，配置全文如下
+3.1`vi /etc/default/grub`编辑grub配置，将GRUB\_CMDLINE\_LINUX\_DEFAULT的值改为`quiet intel_iommu=on iommu=pt initcall_blacklist=sysfb_init pcie_acs_override=downstream`，配置全文如下
 
 ```conf
 # If you change this file, run 'update-grub' afterwards to update
@@ -61,7 +64,7 @@ proxmox-boot-tool kernel pin 6.2.11-1-pve
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=5
 GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`
-GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on video=efifb:off,vesafb:off i915.enable_guc=7"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt initcall_blacklist=sysfb_init pcie_acs_override=downstream"
 GRUB_CMDLINE_LINUX=""
 
 # Uncomment to enable BadRAM filtering, modify to suit your needs
@@ -98,7 +101,7 @@ GRUB_CMDLINE_LINUX=""
 vfio
 vfio_iommu_type1
 vfio_pci
-vfio_virqfd
+# vfio_virqfd # 若内核在6.2版本以下需要打开注释
 ```
 
 3.3 `vi /etc/modprobe.d/blacklist.conf` 编辑黑名单，让pve开机不加载核显驱动,这个文件可以不存在，vi打开时是新建状态，添加完配置后文件全文如下
@@ -108,20 +111,30 @@ blacklist snd_hda_intel
 blacklist snd_hda_codec_hdmi
 blacklist i915
 ```
+3.4 `vim /etc/modprobe.d/kvm.conf`在其中加入如下内容。
 
-### 3.4 重载系统配置
+```
+options kvm ignore_msrs=1 report_ignored_msrs=0
+```
+ignore_msrs=1 意为忽略异常 report_ignored_msrs=0 意为不报告异常
 
-3.4.1`update-grub`刷新grub配置
 
-3.4.2`update-initramfs -u -k all`刷新initramfs
 
-3.4.3`reboot`重启pve
+**3.5 重载系统配置**
 
-3.4.4`dmesg | grep -e DMAR -e IOMMU -e AMD-Vi`查询系统状态是否确实开启了IOMMU
+3.5.1`update-grub`刷新grub配置
 
-### 3.5 确定核显的设备号
+3.5.2`update-initramfs -u -k all`刷新initramfs
 
-3.5.1 执行`lspci`命令，可以看到pci设备的列表，大致如下：
+3.5.3`proxmox-boot-tool refresh`，使用PVE8版本新增的工具刷新配置。
+
+3.5.4`reboot`重启pve
+
+3.5.5`dmesg | grep -e DMAR -e IOMMU -e AMD-Vi`查询系统状态是否确实开启了IOMMU
+
+**3.6 确定核显的设备号**
+
+3.6.1 执行`lspci`命令，可以看到pci设备的列表，大致如下：
 
 ```txt
 root@aquar:~# lspci
@@ -152,22 +165,22 @@ root@aquar:~# lspci
 
 其中可以看出来00:02.0是intel的核显。
 
-3.5.2 执行`lspci -n -s 00:02` 命令得到完整的设备号8086:4680，记录下来下一步会使用。
+3.6.2 执行`lspci -n -s 00:02` 命令得到完整的设备号8086:4680，记录下来下一步会使用。
 
 ```txt
 root@aquar:~# lspci -n -s 00:02
 00:02.0 0380: 8086:4680 (rev 0c)
 ```
 
-3.6 `vi /etc/modprobe.d/vfio.conf `配置直通的核显信息，ids替换成3.5.2记录下来的设备号
+3.7 `vi /etc/modprobe.d/vfio.conf `配置直通的核显信息，ids替换成3.5.2记录下来的设备号
 
 ```conf
 options vfio-pci ids=8086:4680
 ```
 
-3.7执行`update-initramfs -u`更新Initramfs
+3.8执行`update-initramfs -u`更新Initramfs
 
-3.8 `reboot`重启pve
+3.9 `reboot`重启pve
 
 ## 4.配置ubuntu
 

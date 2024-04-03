@@ -14,7 +14,7 @@ TrueNAS下的NFS服务配置
 
 4.在表单中选择/mnt/目录下自己存储池同名的文件夹
 
-![27c766f389d6cbe5ec77aef771f9cc32.png](../_resources/241888b9568c41fa9f174eb65e95507e.png)
+![76f74ba7d7254ffd9caa591ab3d99a4f.png](../_resources/76f74ba7d7254ffd9caa591ab3d99a4f.png)
 
 5.点击ADVANCED OPTIONS，高级选项。设置NFS的描述信息，勾选Enabled启用NFS共享，然后在高级选项中设置为将所有用户的操作都映射为aquar用户。（aquar用户创建步骤及原因解释请参考用户配置章节）
 

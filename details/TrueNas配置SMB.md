@@ -13,7 +13,9 @@ TrueNas配置SMB
 3.然后转到sharing下配置想要共享出去的目录，选择存储池的根目录，配置上同样没有做什么特殊的改动，截图供参考。
 
 ![45771324e2a045b3845e45238ae7a9a7.png](../_resources/45771324e2a045b3845e45238ae7a9a7.png)
-![f3568c30ec9724c6bca94434c05cc95f.png.png](../_resources/f3568c30ec9724c6bca94434c05cc95f.png)
+
+![23559d3d55244676ae6fdb64dae0c7fc.png](../_resources/23559d3d55244676ae6fdb64dae0c7fc.png)
+
 
 4.在同一个局域网中，在文件管理器显示各个硬盘页面的空白处右键，选择“添加一个网络位置”。
 

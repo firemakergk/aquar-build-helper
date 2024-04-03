@@ -29,7 +29,7 @@ GRUB_CMDLINE_LINUX_DEFAULT="quiet"
 把它改成如下内容， 如果是amd cpu则改成amd_iommu：
 
 ```
-GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on video=efifb:off,vesafb:off"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt initcall_blacklist=sysfb_init pcie_acs_override=downstream"
 
 ```
 
@@ -42,7 +42,6 @@ GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on video=efifb:off,vesafb:off"
 vfio
 vfio_iommu_type1
 vfio_pci
-vfio_virqfd
 ```
 
 添加完后如下所示
@@ -55,7 +54,6 @@ vfio_virqfd
 vfio
 vfio_iommu_type1
 vfio_pci
-vfio_virqfd
 ```
 
 完成后：wq保存退出
@@ -66,12 +64,14 @@ vfio_virqfd
 
 6,重启pve
 
-7.在硬件设置功能中点添加-> PCI设备，在设备列表中选择想要直通的显卡。勾选“所有功能”，勾选PCI-Express，勾选“高级"（默认就已勾选）
+7.在硬件设置功能中点添加-> PCI设备，在设备列表中选择想要直通的显卡。打开“高级"设置项，勾选“所有功能”，勾选主GPU（Primary GPU），勾选PCI-Express，
+
+![452a79b828df411fb716e70164355868.png](../_resources/452a79b828df411fb716e70164355868.png)
 
 8.打开虚拟机可以看到已经有这个设备了，但是显示没有驱动，到官网上下载驱动，安装好以后显卡就可以正常使用了。
 
-9.将原来的虚拟显卡去掉。关闭虚拟机，将硬件列表中原来的显示（Display）设置为：none（none）。
+9.将原来的虚拟显卡去掉。关闭虚拟机，将硬件列表中原来的显示（Display）设置为：VirtIO-GPU。经试验，这样配置可以在同时使web console显示及物理显示器画面正常，并且parsec可以正常调用独显的解码。
 
-10.将新直通的独显设置为主显卡。找到硬件列表中的显卡配置项，双击打开设置页面，勾选“主GPU”后保存。
+![dfc3c7b2041a4e40bb29965623c648ff.png](../_resources/dfc3c7b2041a4e40bb29965623c648ff.png)
 
-11.给独显的接口连接上显示器，重新打开虚拟机， 如果一切正常的话，就可以看到开机画面了。
+11.给独显的接口连接上显示器，重新打开虚拟机， 如果一切正常的话，就可以看到开机画面了。安装parsec并启动后，也可以正常远程连接。

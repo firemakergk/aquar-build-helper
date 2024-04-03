@@ -14,14 +14,14 @@ TrueNAS下的WebDAV服务配置
 
 4.选择自己想要使用WebDAV服务共享的目录，这里我只需要使用WebDAV同步joplin笔记数据，所以仅选择了存放joplin数据的目录。另外需勾选Change User & Group Ownership选项，在TrueNAS下，WebDAV服务的用户名必须是"webdav"，我尝试赋权给其他用户但没有成功。
 
-![62ffd10c9ee75a504e8a6e812045d3ee.png](../_resources/89a261daaddd47efaf1a85f8a108aa92.png)
+![d879f753b18a4ca299d421bf69b0a370.png](d879f753b18a4ca299d421bf69b0a370.png)
 
 5.验证服务
 
-打开浏览器，输入`http:[TrueNAS内网地址]:8080[/WebDAV服务的名称]`（例如http://192.168.0.104:8080/joplindata）如果页面弹出登录提示说明服务已经启动。
+打开浏览器，输入`http:[TrueNAS内网地址]:8080[/WebDAV服务的名称]`（例如http://192.168.0.104:8080/webdav）如果页面弹出登录提示说明服务已经启动。
 
 ![dd641520f2e1759f293fb39275d2e71f.png](../_resources/8d607b024a8942bf8f95e774b353942a.png)
 
 用户名填写webdav，密码填写在Services页面设置的密码，即可在网页中看到共享目录中的内容。
 
-![17f4cbee4654b7025669c1283ca47cf8.png](../_resources/c6ff350b366c4d81a734aff71e136625.png)
+![40f08230c3924e93918c84621d990f3e.png](../_resources/40f08230c3924e93918c84621d990f3e.png)

@@ -115,25 +115,6 @@ services:
     depends_on:
       - "mariadb"
     restart: unless-stopped
-  # jellyfin:
-  #   image: ghcr.io/linuxserver/jellyfin
-  #   container_name: jellyfin
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ="Asia/Shanghai"
-  #     # - UMASK_SET=<022> #optional
-  #   volumes:
-  #     - /opt/aquar/storages/apps/jellyfin/config:/config
-  #     - /opt/aquar/storages/apps/jellyfin/data/tvshows:/data/tvshows
-  #     - /opt/aquar/storages/aquarpool/movies:/data/movies
-  #     # - /opt/vc/lib:/opt/vc/lib #optional
-  #   ports:
-  #     - 8096:8096
-  #     - 8920:8920 #optional
-  #     - 7359:7359/udp #optional
-  #     - 1900:1900/udp #optional
-  #   restart: unless-stopped
   jellyfin:
     image: nyanmisaka/jellyfin
     container_name: jellyfin
@@ -229,26 +210,26 @@ services:
     ports:
       - "3306:3306"
     restart: unless-stopped
-  filerun:
-    image: filerun/filerun
-    container_name: filerun
-    environment:
-      FR_DB_HOST: mariadb
-      FR_DB_PORT: 3306
-      FR_DB_NAME: filerun
-      FR_DB_USER: root
-      FR_DB_PASS: root
-      APACHE_RUN_USER: aquar
-      APACHE_RUN_USER_ID: 1000
-      APACHE_RUN_GROUP: aquar
-      APACHE_RUN_GROUP_ID: 1000
-    depends_on:
-      - mariadb
-    ports:
-      - "8008:80"
-    volumes:
-      - /opt/aquar/storages/apps/filerun/html:/var/www/html
-      - /opt/aquar/storages/aquarpool:/user-files
+  # filerun:
+  #   image: filerun/filerun
+  #   container_name: filerun
+  #   environment:
+  #     FR_DB_HOST: mariadb
+  #     FR_DB_PORT: 3306
+  #     FR_DB_NAME: filerun
+  #     FR_DB_USER: root
+  #     FR_DB_PASS: root
+  #     APACHE_RUN_USER: aquar
+  #     APACHE_RUN_USER_ID: 1000
+  #     APACHE_RUN_GROUP: aquar
+  #     APACHE_RUN_GROUP_ID: 1000
+  #   depends_on:
+  #     - mariadb
+  #   ports:
+  #     - "8008:80"
+  #   volumes:
+  #     - /opt/aquar/storages/apps/filerun/html:/var/www/html
+  #     - /opt/aquar/storages/aquarpool:/user-files
   navidrome:
     image: deluan/navidrome:latest
     container_name: navidrome

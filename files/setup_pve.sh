@@ -1,15 +1,17 @@
 echo '********开始修改pve源为国内源********'
 mv /etc/apt/sources.list.d/pve-enterprise.list /etc/apt/sources.list.d/pve-enterprise.list.bak
+mv /etc/apt/sources.list.d/ceph.list /etc/apt/sources.list.d/ceph.list.bak
+
 if ! grep -q '##\[aquar config start\]##' /etc/apt/sources.list;
 then
     cp /etc/apt/sources.list /etc/apt/sources.list.bak
     cat > /etc/apt/sources.list <<EOF
 ##[aquar config start]##
-deb https://mirrors.ustc.edu.cn/debian/ bullseye main contrib non-free
-deb https://mirrors.ustc.edu.cn/debian/ bullseye-updates main contrib non-free
-deb https://mirrors.ustc.edu.cn/debian/ bullseye-backports main contrib non-free
-deb https://mirrors.ustc.edu.cn/debian-security bullseye-security main contrib 
-deb https://mirrors.ustc.edu.cn/proxmox/debian bullseye pve-no-subscription
+deb https://mirrors.ustc.edu.cn/debian/ bookworm main contrib non-free
+deb https://mirrors.ustc.edu.cn/debian/ bookworm-updates main contrib non-free
+deb https://mirrors.ustc.edu.cn/debian/ bookworm-backports main contrib non-free
+deb https://mirrors.ustc.edu.cn/debian-security bookworm-security main contrib 
+deb https://mirrors.ustc.edu.cn/proxmox/debian bookworm pve-no-subscription
 ##[aquar config end]##
 EOF
 else
@@ -190,14 +192,14 @@ systemctl enable ipupdater.service
 ls -l /dev/disk/by-id/
 # 获取到这个命令的磁盘信息
 
-qm set 101 -scsi2 /dev/disk/by-id/ata-ST4000VX015-3CU104_WW618Q3D
-qm set 101 -scsi3 /dev/disk/by-id/ata-ST4000VX015-3CU104_WW6199F0
+qm set 101 -sata1 /dev/disk/by-id/ata-ST4000VX015-3CU104_WW618Q3D
+qm set 101 -sata2 /dev/disk/by-id/ata-ST4000VX015-3CU104_WW6199F0
 
 # 配置TrueNAS的存储池
 
 
 cp /etc/default/grub /etc/default/grub.bak
-sed -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/quiet/quiet quiet intel_iommu=on iommu=pt video=efifb:off,vesafb:off i915.enable_guc=7/g' /etc/default/grub
+sed -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/quiet/quiet quiet intel_iommu=on iommu=pt initcall_blacklist=sysfb_init pcie_acs_override=downstream/g' /etc/default/grub
 
 cat > /etc/modules <<EOF
 vfio
