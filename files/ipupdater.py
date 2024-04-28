@@ -14,14 +14,9 @@
 # WantedBy=multi-user.target
 
 
-# import netifaces as ni
-# import os
-# import getopt
 import socket
 import shutil
 import re
-# from ipaddress import IPv4Network
-# import time
 
 NTERFACE_PATH = '/etc/network/interfaces'
 HOSTS_PATH = '/etc/hosts'
@@ -87,11 +82,11 @@ def updateHosts(ip):
     shutil.copy(HOSTS_PATH, HOSTS_PATH + '.bak')
     targetFile = open(HOSTS_PATH, "r+")
     configText = targetFile.read()
-    splitRes = re.split("\n.+ pve\n", configText)
+    splitRes = re.split("\n.+ ${pve_host}\n", configText)
     print(splitRes)
     prepart = splitRes[0]
     postpart = splitRes[1]
-    updateConfig = "\n%s pve\n" % ip
+    updateConfig = "\n%s ${pve_host}\n" % ip
     print("----host updateConfig----\n %s" % updateConfig)
     newConifg = prepart + updateConfig+ postpart
     print("----host newConifg----\n%s" % newConifg)
@@ -125,13 +120,3 @@ if __name__ == "__main__":
     print("ip:%s" % ip)
     updateHosts(ip)
     updateIssue(ip)
-    # if checkIfIpChanged(ip, defaultGateWay): 
-    #     print('ipupdater find ip adress has changed, trying to update ip config.')
-    #     updateInterfaces(ip, defaultGateWay, maskBits)
-    #     updateHosts(ip)
-    #     updateIssue(ip)
-    #     print('ipupdater update ip config successfully. system will reboot after 120 seconds.')
-    #     time.sleep(120)
-    #     os.system("reboot")
-    # else:
-    #     print('ipupdater is no need to do anything.')
